@@ -11,4 +11,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^course/', include('courses.urls')),
     url(r'^$', CourseListView.as_view(), name='course_list'),
+    url(r'^students/', include('students.urls')),
 ]
