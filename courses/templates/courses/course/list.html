@@ -10,11 +10,11 @@
 
 {% block content %}
     <h1>
-    {% if subject %}
-        Kursy z dziedziny: {{ subject.title }}
-    {% else %}
-        Wszystkie kursy
-    {% endif %}
+        {% if subject %}
+            Kursy z dziedziny: {{ subject.title }}
+        {% else %}
+            Wszystkie kursy
+        {% endif %}
     </h1>
     <div class="contents">
         <h3>Tematy</h3>
@@ -35,7 +35,7 @@
     <div class="module">
         {% for course in courses %}
             {% with subject=course.subject %}
-                <h3><a href="{% url 'courses:course_detail' course.slug %}">{{ course.detail }}</a></h3>
+                <h3><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></h3>
                 <p>
                     <a href="{% url 'courses:course_list_subject' subject.slug %}">{{ subject }}</a>
                     {{ course.total_modules }} moduł{{ course.total_modules|pluralize:'y' }}.
