@@ -8,6 +8,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.base import TemplateResponseMixin, View
 
+from students.forms import CourseEnrollForm
 from .forms import ModuleFormSet
 from .models import Course, Module, Content, Subject
 
@@ -117,8 +118,8 @@ class ContentCreateUpdateView(TemplateResponseMixin, View):
 
 
 class ContentDeleteView(View):
-	def post(self, request, id):
-		content = get_object_or_404(Content, id=id, module__course__owner=request.user)
+	def post(self, request, item_id):
+		content = get_object_or_404(Content, id=item_id, module__course__owner=request.user)
 		module = content.module
 		content.item.delete()
 		content.delete()
@@ -135,15 +136,15 @@ class ModuleContentListView(TemplateResponseMixin, View):
 
 class ModuleOrderView(CsrfExemptMixin, JsonRequestResponseMixin, View):
 	def post(self, request):
-		for id, order in self.request_json.items():
-			Module.objects.filter(id=id, course__owner=request.user).update(order=order)
+		for item_id, order in self.request_json.items():
+			Module.objects.filter(id=item_id, course__owner=request.user).update(order=order)
 		return self.render_json_response({'saved': 'OK'})
 
 
 class ContentOrderView(CsrfExemptMixin, JsonRequestResponseMixin, View):
 	def post(self, request):
-		for id, order in self.request_json.items():
-			Content.objects.filter(id=id, module__course__owner=request.user).update(order=order)
+		for item_id, order in self.request_json.items():
+			Content.objects.filter(id=item_id, module__course__owner=request.user).update(order=order)
 		return self.render_json_response({'saved': 'OK'})
 
 
@@ -164,3 +165,8 @@ class CourseListView(TemplateResponseMixin, View):
 class CourseDetailView(DetailView):
 	model = Course
 	template_name = 'courses/course/detail.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['enroll_form'] = CourseEnrollForm(initial={'course': self.object})
+		return context
